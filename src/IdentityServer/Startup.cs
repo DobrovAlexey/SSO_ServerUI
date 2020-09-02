@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityServer
 {
@@ -27,43 +28,36 @@ namespace IdentityServer
         {
             services.AddControllersWithViews();
 
-            var builder = services.AddIdentityServer(options =>
-                {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
-
-                    // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-                    options.EmitStaticAudienceClaim = true;
-                })
+            var builder = services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
                 .AddTestUsers(TestUsers.Users);
 
-            //var builder = services.AddIdentityServer(options =>
-            //{
-            //    options.Events.RaiseErrorEvents = true;
-            //    options.Events.RaiseInformationEvents = true;
-            //    options.Events.RaiseFailureEvents = true;
-            //    options.Events.RaiseSuccessEvents = true;
+            {
+                //var builder = services.AddIdentityServer(options =>
+                //{
+                //    options.Events.RaiseErrorEvents = true;
+                //    options.Events.RaiseInformationEvents = true;
+                //    options.Events.RaiseFailureEvents = true;
+                //    options.Events.RaiseSuccessEvents = true;
 
-            //    // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-            //    options.EmitStaticAudienceClaim = true;
-            //})
-            //    .AddTestUsers(TestUsers.Users);
+                //    // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
+                //    options.EmitStaticAudienceClaim = true;
+                //})
+                //    .AddTestUsers(TestUsers.Users);
 
-            //// in-memory, code config
-            //builder.AddInMemoryIdentityResources(Config.IdentityResources);
-            //builder.AddInMemoryApiScopes(Config.ApiScopes);
-            //builder.AddInMemoryClients(Config.Clients);
+                //// in-memory, code config
+                //builder.AddInMemoryIdentityResources(Config.IdentityResources);
+                //builder.AddInMemoryApiScopes(Config.ApiScopes);
+                //builder.AddInMemoryClients(Config.Clients);
+            }
 
             //// not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
 
             services.AddAuthentication()
-                .AddGoogle(options =>
+                .AddGoogle("Google", options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
@@ -72,6 +66,23 @@ namespace IdentityServer
                     // set the redirect URI to https://localhost:5001/signin-google
                     options.ClientId = "copy client ID from Google here";
                     options.ClientSecret = "copy client secret from Google here";
+                })
+                .AddOpenIdConnect("oidc", "Demo IdentityServer", options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    options.SignOutScheme = IdentityServerConstants.SignoutScheme;
+                    options.SaveTokens = true;
+
+                    options.Authority = "https://demo.identityserver.io/";
+                    options.ClientId = "interactive.confidential";
+                    options.ClientSecret = "secret";
+                    options.ResponseType = "code";
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+                    };
                 });
         }
 

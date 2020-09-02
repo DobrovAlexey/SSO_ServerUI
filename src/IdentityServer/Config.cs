@@ -46,12 +46,6 @@ namespace IdentityServer
                 new ApiScope(name: "read",   displayName: "Read your data."),
                 new ApiScope(name: "write",  displayName: "Write your data."),
                 new ApiScope(name: "delete", displayName: "Delete your data."),
-
-                new ApiScope("access_223", "ФЗ-223", new []
-                {
-                    "read_223",
-                    "write_223"
-                })
             };
 
         // Добавление клиентов.
@@ -90,6 +84,17 @@ namespace IdentityServer
                 //},
 
                 #endregion
+
+                // machine to machine client
+                new Client
+                {
+                    ClientId = "client",
+                    ClientSecrets = { new Secret("secret".Sha256()) },
+
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    // scopes that client has access to
+                    AllowedScopes = { "api" }
+                },
 
                 // interactive ASP.NET Core MVC client
                 new Client

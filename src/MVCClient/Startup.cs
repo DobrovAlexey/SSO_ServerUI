@@ -43,10 +43,7 @@ namespace MVCClient
 
                     options.SaveTokens = true;
 
-                    options.Scope.Clear();
-                    options.Scope.Add("openid");
                     options.Scope.Add("api");
-                    options.Scope.Add("info_223");
                 });
         }
 

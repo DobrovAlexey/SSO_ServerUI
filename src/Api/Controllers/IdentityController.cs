@@ -12,5 +12,11 @@ namespace Api.Controllers
         {
             return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
         }
+
+        [HttpPost, AllowAnonymous]
+        public IActionResult Post()
+        {
+            return Ok(true);
+        }
     }
 }
