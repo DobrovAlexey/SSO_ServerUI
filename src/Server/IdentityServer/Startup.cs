@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using IdentityServer4;
 using IdentityServerHost.Quickstart.UI;
 using Microsoft.AspNetCore.Builder;
@@ -28,11 +30,18 @@ namespace IdentityServer
         {
             services.AddControllersWithViews();
 
+            var cert = new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "idsrvtest.pfx"), "idsrv3test");
+
             var builder = services.AddIdentityServer()
+                .AddSigningCredential(cert)
                 .AddInMemoryIdentityResources(Config.IdentityResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users);
+                .AddTestUsers(TestUsers.Users)
+                .AddWsFederation();
+
+            //// not recommended for production - you need to store your key material somewhere secure
+            //builder.AddDeveloperSigningCredential();
 
             {
                 //var builder = services.AddIdentityServer(options =>
@@ -44,17 +53,8 @@ namespace IdentityServer
 
                 //    // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
                 //    options.EmitStaticAudienceClaim = true;
-                //})
-                //    .AddTestUsers(TestUsers.Users);
-
-                //// in-memory, code config
-                //builder.AddInMemoryIdentityResources(Config.IdentityResources);
-                //builder.AddInMemoryApiScopes(Config.ApiScopes);
-                //builder.AddInMemoryClients(Config.Clients);
+                //});
             }
-
-            //// not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
 
             services.AddAuthentication()
                 .AddGoogle("Google", options =>

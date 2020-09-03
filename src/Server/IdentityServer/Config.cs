@@ -121,7 +121,23 @@ namespace IdentityServer
                         "read",
                         "info_223"
                     }
-                }
+                },
+
+                new Client
+                {
+                    ClientId = "urn:owinrp",
+                    ProtocolType = IdentityServerConstants.ProtocolTypes.WsFederation,
+
+                    RedirectUris = { "http://localhost:10313/" },
+                    FrontChannelLogoutUri = "http://localhost:10313/home/signoutcleanup",
+                    IdentityTokenLifetime = 36000,
+
+                    AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile
+                    }
+                },
             };
     }
 }

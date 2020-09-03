@@ -11,4 +11,8 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityServer4.WsFederation\IdentityServer4.WsFederation.csproj" />
+  </ItemGroup>
+
 </Project>
